@@ -18,7 +18,8 @@ import {
   type MouseEventHandler,
 } from "react";
 import { useControllableState } from "@radix-ui/react-use-controllable-state";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
+import { useReducedMotion } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 // ============================================================================

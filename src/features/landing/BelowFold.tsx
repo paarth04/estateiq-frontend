@@ -1,5 +1,7 @@
+import { Link } from "react-router-dom";
 import { useEffect, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
+import { useReducedMotion } from "@/lib/motion";
 import { ArrowRight, MessageSquareQuote, Pause, Phone, Play } from "lucide-react";
 import { PROJECTS } from "@/api/mock";
 import { BrandMark } from "@/components/BrandMark";
@@ -387,6 +389,14 @@ function Footer() {
                   </a>
                 </li>
               ))}
+              {c.head === "Legal" && (
+                // Admin-only entry (rev 3: clients have no account — they just call). Kept subtle.
+                <li className="pt-2">
+                  <Link to="/admin/login" className="text-small text-ink-muted hover:text-ink underline-offset-4 hover:underline transition rounded-control">
+                    Admin login
+                  </Link>
+                </li>
+              )}
             </ul>
           </nav>
         ))}

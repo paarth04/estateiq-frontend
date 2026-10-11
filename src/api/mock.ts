@@ -52,7 +52,7 @@ export const ENQUIRIES: ClientEnquiry[] = [
   },
   {
     id: "e2", projectId: "p10", project: "Baner Greens", city: "Pune",
-    date: "8 Oct 2026, 11:05 AM", duration: "2 min 40 sec", status: "new",
+    date: "8 Oct 2026, 11:05 AM", duration: "2 min 40 sec", status: "not_contacted",
     summary: "You enquired about 2 BHK apartments in Baner Greens and asked about the co-working lounge and possession timeline.",
     details: { bhk: "2 BHK", budget: null, city: "Pune", locality: "Baner", propertyType: "Apartment", amenities: "Co-working lounge", furnishing: "Unfurnished" },
     transcript: [
@@ -67,8 +67,10 @@ export const ENQUIRIES: ClientEnquiry[] = [
 
 /** Client sees friendly words, never the raw enum (§10.3). */
 export const statusToFriendly: Record<LeadStatus, string> = {
-  new: "Received",
+  not_contacted: "Received",
   contacted: "Team has reached out",
+  call_back: "We'll call you back",
+  visit_scheduled: "Visit scheduled",
   converted: "Booked",
   lost: "Closed",
 };

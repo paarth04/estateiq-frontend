@@ -148,6 +148,63 @@ body {
 @keyframes eq-pop { from { opacity: 0; transform: translateY(8px) scale(0.96); } to { opacity: 1; transform: none; } }
 .eq-pop { animation: eq-pop 250ms var(--ease-out) both; }
 
+/* Admin Overview KPI card: hover lift, spring-open preview (grid-rows 0fr→1fr fits content exactly). */
+.eq-kpi {
+  background: rgb(var(--surface));
+  border: 1px solid rgb(var(--border));
+  border-radius: var(--radius-card);
+  padding: var(--space-4) var(--space-6);
+  cursor: pointer;
+  transition: border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+}
+.eq-kpi--hl { background: rgb(var(--accent-soft)); border-color: rgb(var(--accent)); }
+.eq-kpi:hover { transform: translateY(-2px); border-color: rgb(var(--accent)); box-shadow: 0 6px 20px rgb(var(--accent) / .12); }
+.eq-kpi.is-expanded { border-color: rgb(var(--accent)); box-shadow: 0 8px 28px rgb(var(--accent) / .16); }
+.eq-kpi__drawer { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .45s cubic-bezier(.34, 1.56, .64, 1); }
+.eq-kpi.is-expanded .eq-kpi__drawer { grid-template-rows: 1fr; }
+.eq-kpi__drawer > div { overflow: hidden; min-height: 0; }
+.eq-kpi__row { opacity: 0; transform: translateY(6px); transition: opacity .3s ease, transform .3s ease; }
+.eq-kpi.is-expanded .eq-kpi__row { opacity: 1; transform: none; transition-delay: calc(280ms + var(--i, 0) * 60ms); /* after the number settles */ }
+
+/* Auto-height expand (Leads row detail): grid-rows 0fr → 1fr fits content exactly, soft spring. */
+.eq-expand { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .45s cubic-bezier(.34, 1.25, .64, 1); }
+.eq-expand.is-open { grid-template-rows: 1fr; }
+.eq-expand > div { overflow: hidden; min-height: 0; }
+
+/* Transcript paper/linen texture. Lives on ::before so it never touches text; bubbles keep
+   their own solid fills, so the grain only shows in the gaps between them. */
+.eq-transcript {
+  position: relative;
+  isolation: isolate;
+  background-color: rgb(var(--surface));
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+}
+.eq-transcript::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image: url("/images/transcript-texture.png");
+  background-size: 320px;
+  /* Light: multiply the near-white tile into the surface → faint grey grain, not a white sheet. */
+  mix-blend-mode: multiply;
+  opacity: 0.7;
+}
+/* Dark: the tile is mostly transparent (alpha ≤ 53/255), so an inverted soft-light layer was
+   invisible. Screen its light weave onto the dark surface instead — a subtle grain; panel stays
+   dark (lightest gap ≈ #2a2b29; --ink 12.5:1, --ink-soft 6.7:1). */
+[data-theme="dark"] .eq-transcript::before {
+  mix-blend-mode: screen;
+  opacity: 0.22;
+}
+
+/* Right-side sheet (drill-down drawer) */
+@keyframes eq-sheet-in { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: none; } }
+.eq-sheet { animation: eq-sheet-in .35s var(--ease-out) both; }
+
 /* Widget "connecting" dots + AI-speaking equalizer (§17.4). */
 @keyframes eq-dot { 0%, 80%, 100% { transform: translateY(0); opacity: .4; } 40% { transform: translateY(-6px); opacity: 1; } }
 .eq-dot { animation: eq-dot 1.2s var(--ease-in-out) infinite; animation-delay: calc(var(--i, 0) * 150ms); }
@@ -184,6 +241,8 @@ body {
   .eq-marquee:has(.eq-marquee__copy) { overflow-x: auto; }
   .eq-marquee__copy, .eq-marquee__control { display: none; }
   .reveal { opacity: 1; transform: none; }
+  .eq-kpi, .eq-kpi__drawer, .eq-kpi__row, .eq-expand { transition: none !important; }
+  .eq-kpi:hover { transform: none; }
   .eq-pop { animation: eq-fade 200ms var(--ease-out) both !important; }
   .eq-pop-backdrop { animation: eq-fade 200ms var(--ease-out) both !important; }
   .eq-draw { stroke-dashoffset: 0; }
@@ -194,3 +253,23 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* In-app "Reduce motion" (Settings) — same rules as the OS media query above. */
+:root[data-reduced-motion="true"] .eq-ring, :root[data-reduced-motion="true"] .eq-breathe, :root[data-reduced-motion="true"] .eq-risein, :root[data-reduced-motion="true"] .eq-blob, :root[data-reduced-motion="true"] .eq-float, :root[data-reduced-motion="true"] .eq-marquee__track, :root[data-reduced-motion="true"] .eq-dot, :root[data-reduced-motion="true"] .eq-eq, :root[data-reduced-motion="true"] .eq-word, :root[data-reduced-motion="true"] .eq-fade { animation: none; }
+:root[data-reduced-motion="true"] .hl-drift, :root[data-reduced-motion="true"] .hl-float, :root[data-reduced-motion="true"] .hl-arc, :root[data-reduced-motion="true"] .hl-swing, :root[data-reduced-motion="true"] .hl-ring, :root[data-reduced-motion="true"] .hl-nudge { animation: none !important; }
+/* Project ticker: static, user-scrollable row; drop the loop copy and the pause control. */
+:root[data-reduced-motion="true"] .eq-marquee:has(.eq-marquee__copy) { overflow-x: auto; }
+:root[data-reduced-motion="true"] .eq-marquee__copy, :root[data-reduced-motion="true"] .eq-marquee__control { display: none; }
+:root[data-reduced-motion="true"] .reveal { opacity: 1; transform: none; }
+:root[data-reduced-motion="true"] .eq-kpi, :root[data-reduced-motion="true"] .eq-kpi__drawer, :root[data-reduced-motion="true"] .eq-kpi__row, :root[data-reduced-motion="true"] .eq-expand { transition: none !important; }
+:root[data-reduced-motion="true"] .eq-kpi:hover { transform: none; }
+:root[data-reduced-motion="true"] .eq-pop { animation: eq-fade 200ms var(--ease-out) both !important; }
+:root[data-reduced-motion="true"] .eq-pop-backdrop { animation: eq-fade 200ms var(--ease-out) both !important; }
+:root[data-reduced-motion="true"] .eq-draw { stroke-dashoffset: 0; }
+:root[data-reduced-motion="true"] *, :root[data-reduced-motion="true"] *::before, :root[data-reduced-motion="true"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+

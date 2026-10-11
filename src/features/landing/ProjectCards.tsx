@@ -1,7 +1,8 @@
 import { useState, type CSSProperties } from "react";
 import { ArrowRight, Building2, Check, IndianRupee, MapPin, Phone } from "lucide-react";
 import type { Project } from "@/api/types";
-import { PROJECTS } from "@/api/mock";
+import { projectImage, projectView, useCatalog } from "@/api/catalog";
+import { PropertyCard } from "@/components/PropertyCard";
 import { Button } from "@/components/Button";
 import { CityPill } from "@/components/CityPill";
 import {
@@ -27,7 +28,8 @@ import { useInView } from "./useInView";
  */
 
 const slug = (name: string) => name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-const imageFor = (p: Project) => `/images/${slug(p.name)}.jpg`;
+/** Admin-set cover image (shared catalog), else the placeholder by name. */
+const imageFor = (p: Project) => projectImage(p) || `/images/${slug(p.name)}.jpg`;
 const altFor = (p: Project) => `${p.name}, a residential project in ${p.locality}, ${p.city}`;
 
 /** Short pin text for the card corner. */
@@ -104,6 +106,8 @@ function ProjectCutoutCard({ project: p, onOpen, index }: { project: Project; on
 /* ---------------- detail dialog ---------------- */
 
 function ProjectDetail({ project: p, onCall }: { project: Project; onCall: () => void }) {
+  const { properties } = useCatalog();
+  const homes = properties.filter((x) => x.projectId === p.id && x.status !== "sold");
   const facts: [string, string][] = [
     ["City", p.city],
     ["Locality", p.locality],
@@ -127,6 +131,8 @@ function ProjectDetail({ project: p, onCall }: { project: Project; onCall: () =>
           {p.locality}, {p.city} · sample project data for this demo
         </DialogDescription>
       </DialogHeader>
+
+      {p.description && <p className="text-body text-ink-soft">{p.description}</p>}
 
       <dl className="grid grid-cols-2 gap-x-6 gap-y-3">
         {facts.map(([k, v]) => (
@@ -162,6 +168,15 @@ function ProjectDetail({ project: p, onCall }: { project: Project; onCall: () =>
         </ul>
       </section>
 
+      {homes.length > 0 && (
+        <section aria-labelledby="pd-homes">
+          <h3 id="pd-homes" className="text-small text-ink-muted">Available homes</h3>
+          <ul className="mt-2 grid gap-3">
+            {homes.map((h) => <li key={h.id}><PropertyCard property={h} /></li>)}
+          </ul>
+        </section>
+      )}
+
       <DialogFooter className="pt-2">
         <DialogClose asChild>
           <Button variant="secondary">Close</Button>
@@ -177,12 +192,17 @@ function ProjectDetail({ project: p, onCall }: { project: Project; onCall: () =>
 /* ---------------- grid ---------------- */
 
 export function ProjectCutoutGrid({ onCall }: { onCall: () => void }) {
-  const [open, setOpen] = useState<Project | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
+  // Shared catalog: admin adds/edits show up here immediately.
+  const { projects, properties } = useCatalog();
+  const list = projects.map((p) => projectView(p, properties));
+  const open = list.find((p) => p.id === openId) ?? null;
+  const setOpen = (p: Project | null) => setOpenId(p?.id ?? null);
 
   return (
     <>
       <ul className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {PROJECTS.map((p, i) => (
+        {list.map((p, i) => (
           <ProjectCutoutCard key={p.id} project={p} index={i} onOpen={setOpen} />
         ))}
       </ul>

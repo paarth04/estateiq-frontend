@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
 import { Link } from "react-router-dom";
-import { motion, useInView, useReducedMotion, type Transition } from "motion/react";
+import { motion, useInView, type Transition } from "motion/react";
+import { useReducedMotion } from "@/lib/motion";
 import { ArrowRight, Phone, Menu, ScanText, ShieldCheck, X } from "lucide-react";
 import { BrandMark } from "@/components/BrandMark";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -111,7 +112,7 @@ function Navbar({ onCall }: { onCall: () => void }) {
           dark ? "bg-bg/40 border-ink/20 text-ink" : "bg-surface/80 border-border text-ink"
         }`}
       >
-        <Link to="/landing" aria-label="EstateIQ home"><BrandMark /></Link>
+        <Link to="/" aria-label="EstateIQ home"><BrandMark /></Link>
         {/* centre links */}
         <div className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
           <a href="#about" className={link}>About</a>
@@ -119,14 +120,6 @@ function Navbar({ onCall }: { onCall: () => void }) {
         </div>
         <div className="ml-auto flex items-center gap-2">
           <ThemeToggle />
-          <Link
-            to="/login"
-            className={`hidden sm:grid h-10 px-4 place-items-center rounded-pill border text-body font-semibold transition ${
-              dark ? "border-ink/25 text-ink hover:bg-ink/10" : "border-border bg-surface hover:bg-surface-hover"
-            }`}
-          >
-            Login
-          </Link>
           <button
             onClick={onCall}
             className={`group inline-flex items-center gap-2 h-10 px-4 rounded-pill text-body font-semibold transition active:scale-[0.98] ${
@@ -146,7 +139,6 @@ function Navbar({ onCall }: { onCall: () => void }) {
           {[["#projects", "Projects"], ["#about", "About"]].map(([href, label]) => (
             <a key={href} href={href} onClick={() => setOpen(false)} className="h-11 px-3 flex items-center rounded-control text-body hover:bg-surface-hover">{label}</a>
           ))}
-          <Link to="/login" className="h-11 px-3 flex items-center rounded-control text-body hover:bg-surface-hover">Login</Link>
         </div>
       )}
     </header>

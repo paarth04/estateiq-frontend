@@ -9,10 +9,11 @@
  * never reach a `client`. The client-facing types below deliberately omit them (see §12).
  */
 
-export type Role = "client" | "agent" | "admin";
+export type Role = "client" | "admin"; // rev 3: client = lead record (no login); admin = the only login
 export type City = "Nashik" | "Pune";
 
-export type LeadStatus = "new" | "contacted" | "converted" | "lost";
+/** rev 3 vocabulary — labels/colours live in src/api/status.ts. "not_contacted" replaces the old "new". */
+export type LeadStatus = "not_contacted" | "contacted" | "call_back" | "visit_scheduled" | "converted" | "lost";
 export type ScoreBand = "Hot" | "Warm" | "Cold";
 export type SentimentLabel = "Positive" | "Neutral" | "Negative"; // INTERNAL — UI labels, mapped from the model's 3 classes
 export type IntentLabel =
@@ -29,6 +30,9 @@ export interface Project {
   features: string[];
   totalUnits?: number;
   availableUnits?: number;
+  description?: string;
+  /** cover image: a /images/... path, or (mock only) a data URL from an upload */
+  image?: string;
 }
 
 export interface Property {
@@ -40,9 +44,20 @@ export interface Property {
   price: string; // display, e.g. "₹ 65 L"
   beds: number;
   baths: number;
-  tags: string[]; // from properties.features JSONB
+  tags: string[]; // from properties.features JSONB (amenities)
   status?: "available" | "sold" | "hold";
+  propertyType?: PropertyType;
+  bhk?: number;
+  /** price in lakh — the source of truth; `price` is its ₹ display string */
+  priceLakh?: number;
+  areaSqft?: number;
+  furnishing?: Furnishing;
+  /** a /images/... path, or (mock only) a data URL from an upload */
+  image?: string;
 }
+
+export type PropertyType = "Apartment" | "Villa" | "Row house" | "Penthouse" | "Plot";
+export type Furnishing = "Unfurnished" | "Semi-furnished" | "Fully furnished";
 
 /** The structured NER output (DESIGN.md §27.3). A null field renders as "Not mentioned" — never a guess. */
 export interface EnquiryDetails {

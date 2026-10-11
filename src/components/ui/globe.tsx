@@ -11,7 +11,8 @@
  */
 import { useCallback, useEffect, useMemo, useRef, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import createGlobe from "cobe";
-import { useInView, useReducedMotion } from "motion/react";
+import { useInView } from "motion/react";
+import { useReducedMotion } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 export type LatLng = [number, number];

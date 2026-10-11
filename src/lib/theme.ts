@@ -8,6 +8,8 @@ import { useCallback, useEffect, useState } from "react";
  * - An explicit choice is persisted in localStorage (every access wrapped — storage can throw).
  */
 export type Theme = "light" | "dark";
+/** What the user chose: an explicit theme, or follow the system. */
+export type ThemeMode = Theme | "system";
 const KEY = "eq-theme";
 
 function stored(): Theme | null {
@@ -29,6 +31,7 @@ function apply(t: Theme) {
 
 export function useTheme() {
   const [theme, setThemeState] = useState<Theme>(() => (document.documentElement.getAttribute("data-theme") as Theme) || stored() || system());
+  const [mode, setModeState] = useState<ThemeMode>(() => stored() ?? "system");
 
   // Follow OS changes until the user has made an explicit choice.
   useEffect(() => {
@@ -44,16 +47,31 @@ export function useTheme() {
     return () => mq.removeEventListener("change", on);
   }, []);
 
-  const setTheme = useCallback((t: Theme) => {
-    apply(t);
-    setThemeState(t);
+  const setTheme = useCallback((t: ThemeMode) => {
+    const resolved = t === "system" ? system() : t;
+    apply(resolved);
+    setThemeState(resolved);
+    setModeState(t);
     try {
-      localStorage.setItem(KEY, t);
+      if (t === "system") localStorage.removeItem(KEY);
+      else localStorage.setItem(KEY, t);
     } catch {
       /* private mode / blocked storage — the choice just won't persist */
     }
+    // Let other mounted toggles (top bar, settings) pick up the change.
+    window.dispatchEvent(new CustomEvent("eq-theme", { detail: { mode: t, theme: resolved } }));
+  }, []);
+
+  useEffect(() => {
+    const on = (e: Event) => {
+      const d = (e as CustomEvent<{ mode: ThemeMode; theme: Theme }>).detail;
+      setThemeState(d.theme);
+      setModeState(d.mode);
+    };
+    window.addEventListener("eq-theme", on);
+    return () => window.removeEventListener("eq-theme", on);
   }, []);
 
   const toggle = useCallback(() => setTheme(theme === "dark" ? "light" : "dark"), [theme, setTheme]);
-  return { theme, setTheme, toggle };
+  return { theme, mode, setTheme, toggle };
 }

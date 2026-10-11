@@ -1,4 +1,5 @@
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
+import { useReducedMotion } from "@/lib/motion";
 
 /**
  * Hero-only doodles (DESIGN.md §17.6). Inline SVG so each stroke can DRAW via pathLength

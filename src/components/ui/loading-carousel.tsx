@@ -11,7 +11,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Autoplay from "embla-carousel-autoplay";
 import { ChevronRight, Pause, Play } from "lucide-react";
-import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react";
+import { AnimatePresence, motion, type Variants } from "motion/react";
+import { useReducedMotion } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 

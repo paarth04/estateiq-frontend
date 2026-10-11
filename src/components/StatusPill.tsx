@@ -1,19 +1,18 @@
 import type { LeadStatus } from "@/api/types";
 import { statusToFriendly } from "@/api/mock";
+import { statusMeta } from "@/api/status";
+import { cn } from "@/lib/utils";
 
-const dot: Record<LeadStatus, string> = {
-  new: "bg-cold",
-  contacted: "bg-warm",
-  converted: "bg-positive",
-  lost: "bg-ink-muted",
-};
-
-/** Client-facing status: shows the friendly word, never the raw enum (§10.3). */
-export function StatusPill({ status }: { status: LeadStatus }) {
+/**
+ * Lead status badge, colour-coded from the shared vocabulary (src/api/status.ts).
+ * `internal` (admin) shows the real status; the default shows the client-friendly word.
+ */
+export function StatusPill({ status, internal = false, className }: { status: LeadStatus; internal?: boolean; className?: string }) {
+  const m = statusMeta(status);
   return (
-    <span className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-pill bg-surface border border-border text-small text-ink">
-      <span className={`w-2 h-2 rounded-pill ${dot[status]}`} />
-      {statusToFriendly[status]}
+    <span className={cn("inline-flex items-center gap-1.5 h-6 px-2.5 rounded-pill border text-small text-ink whitespace-nowrap", m.tone, className)}>
+      <span className={cn("w-2 h-2 rounded-pill", m.dot)} aria-hidden="true" />
+      {internal ? m.label : statusToFriendly[status]}
     </span>
   );
 }

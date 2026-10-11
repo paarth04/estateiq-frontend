@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { useReducedMotion } from "motion/react";
+import { useReducedMotion } from "@/lib/motion";
 import type { GlobeArc, GlobeMarker } from "@/components/ui/globe";
 // Palette constants only — the globe component + cobe stay in their own lazy chunk.
 import { DARK_PALETTE } from "@/components/ui/globe-palettes";
